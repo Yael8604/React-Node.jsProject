@@ -30,7 +30,7 @@ type: String,
 // enum:['User', 'Admin'],
 // default:"User",
 // },
-active: {//למה צריך את זה?
+active: {
 type: Boolean,
 default: true,
 },

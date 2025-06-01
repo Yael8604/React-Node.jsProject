@@ -1,5 +1,6 @@
 const User = require("../models/User/user")
 const bcrypt= require('bcrypt')
+const jwt = require('jsonwebtoken');
 
 const login = async (req,res)=>{
     const {username, password} = req.body
@@ -12,8 +13,14 @@ const login = async (req,res)=>{
     }
     const match = await bcrypt.compare(password, foundUser.password)
     if(!match)return res.status(401).json({message:'Unauthorized' })
-    res.send("Logged In")
+    const userInfo= {_id:foundUser._id,name:foundUser.name,
+    // roles:foundUser.roles,
+    username:foundUser.username,
+    email:foundUser.email}
+    const accessToken=jwt.sign(userInfo,process.env.ACCESS_TOKEN_SECRET)
+    res.json({ message: 'Logged In successfully!', accessToken: accessToken });
 }
+
 const register = async (req,res)=>{
     const {username, password, name, email, phone} = req.body
     if (!name || !username || !password) {// Confirm data
@@ -33,6 +40,4 @@ const register = async (req,res)=>{
     return res.status(400).json({message:'Invalid user received'})
     }
 }
-
-
 module.exports = {login, register}

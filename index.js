@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+// const jwt= require('jsonwebtoken');
 
 dotenv.config();
 
@@ -22,5 +23,5 @@ app.get('/',function(req,res){
     res.send('שלום עולם');
 })
 
-app.use(express.json());
+app.use(express.json());//בשביל שנוכל להוסיף תוכן בbody בפורמט json בקריאות HTTP בthunder client
 app.use("/api/auth", require("./routes/authRoutes"))
