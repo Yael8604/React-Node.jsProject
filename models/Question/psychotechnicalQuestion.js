@@ -15,5 +15,5 @@ const psychotechnicalQuestionSchema = new Schema({
   }
 });
 
-const PsychotechnicalQuestion = mongoose.model('PsychotechnicalQuestion', psychotechnicalQuestionSchema);
+const PsychotechnicalQuestion = mongoose.model('PsychotechnicalQuestion', psychotechnicalQuestionSchema,'psychotechnical_questions');
 module.exports = PsychotechnicalQuestion;

@@ -30,6 +30,10 @@ type: String,
 // enum:['User', 'Admin'],
 // default:"User",
 // },
+birthDate: {
+    type: Date,
+    required: true
+  },
 active: {
 type: Boolean,
 default: true,

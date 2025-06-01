@@ -10,5 +10,5 @@ const personalityQuestionSchema = new Schema({
   scoringDirection: { type: String, enum: ['positive', 'negative'] }//האם הסכמה עם ההיגד מעידה על רמה גבוהה או נמוכה בממד הנמדד.
 });
 
-const PersonalityQuestion = mongoose.model('PersonalityQuestion', personalityQuestionSchema);
+const PersonalityQuestion = mongoose.model('PersonalityQuestion', personalityQuestionSchema,'personality_questions');
 module.exports = PersonalityQuestion;
