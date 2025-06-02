@@ -1,9 +1,8 @@
-// routes/questionRoutes.js
 const express = require('express');
 const router = express.Router();
 const questionController = require('../controllers/questionController');
+const verifyJWT = require('../middleware/verifyJWT'); // ייבוא של ה-middleware המעודכן
 
-// כאן אנחנו מגדירים את המסלול (route) שיגיב על בקשת GET
-router.get('/questions', questionController.getQuestions);
+router.get('/questions',verifyJWT, questionController.getQuestions);
 
 module.exports = router;

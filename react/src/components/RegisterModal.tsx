@@ -1,6 +1,7 @@
-// RegisterModal.tsx
-import React, { useState } from 'react';
+// src/components/RegisterModal.tsx
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthForm from '../hooks/useAuthForm'; // ייבוא ה-hook
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -15,104 +16,94 @@ interface RegisterFormData {
   email: string;
   phone: string;
   birthDate: string;
+  [key: string]: string;
 }
 
 const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<RegisterFormData>({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    email: '',
-    phone: '',
-    birthDate: '',
-  });
 
-  const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
-  const [isLoading, setIsLoading] = useState(false);
-
-  const validateForm = (): boolean => {
+  // פונקציית ולידציה ספציפית לטופס ההרשמה
+  const validateRegisterForm = (data: RegisterFormData) => {
     const newErrors: Partial<RegisterFormData> = {};
 
-    if (!formData.username) {
+    if (!data.username) {
       newErrors.username = 'שם משתמש הוא שדה חובה';
-    } else if (formData.username.length < 3) {
+    } else if (data.username.length < 3) {
       newErrors.username = 'שם משתמש חייב להכיל לפחות 3 תווים';
     }
 
-    if (!formData.password) {
+    if (!data.password) {
       newErrors.password = 'סיסמה היא שדה חובה';
-    } else if (formData.password.length < 6) {
+    } else if (data.password.length < 6) {
       newErrors.password = 'סיסמה חייבת להכיל לפחות 6 תווים';
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (data.password !== data.confirmPassword) {
       newErrors.confirmPassword = 'הסיסמאות לא תואמות';
     }
 
-    if (!formData.name) {
+    if (!data.name) {
       newErrors.name = 'שם מלא הוא שדה חובה';
     }
 
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+    if (data.email && !/\S+@\S+\.\S+/.test(data.email)) {
       newErrors.email = 'כתובת אימייל לא תקינה';
     }
 
-    if (!formData.birthDate) {
+    if (!data.birthDate) {
       newErrors.birthDate = 'תאריך לידה הוא שדה חובה';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
+  // פונקציית שליחת נתונים לשרת ספציפית להרשמה
+  const submitRegister = async (data: RegisterFormData) => {
+    const response = await fetch('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: data.username,
+        password: data.password,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        birthDate: data.birthDate,
+      }),
+    });
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          birthDate: formData.birthDate,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        navigate('/profile');
-      } else {
-        const error = await response.json();
-        alert(error.message || 'שגיאה בהרשמה');
-      }
-    } catch (error) {
-      alert('שגיאה בהתחברות לשרת');
-    } finally {
-      setIsLoading(false);
+    const responseData = await response.json();
+    if (!response.ok) {
+      throw new Error(responseData.message || 'שגיאה בהרשמה');
     }
+    return responseData;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name as keyof RegisterFormData]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  // שימוש ב-Custom Hook
+  const { formData, errors, isLoading, handleChange, handleSubmit } = useAuthForm<RegisterFormData>({
+    initialData: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      email: '',
+      phone: '',
+      birthDate: '',
+    },
+    validator: validateRegisterForm,
+    submitHandler: submitRegister,
+    onSuccess: (data) => {
+      console.log(data);
+
+      navigate("/PersonalProfile");
+      onClose(); // סגירת המודאל לאחר הצלחה
+    },
+    onFailure: (message) => {
+      alert(message);
+    },
+  });
 
   if (!isOpen) return null;
 

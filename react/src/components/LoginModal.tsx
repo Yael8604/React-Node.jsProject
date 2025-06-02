@@ -1,6 +1,7 @@
-// LoginModal.tsx
+// src/components/LoginModal.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthForm from '../hooks/useAuthForm'; // ייבוא ה-hook
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -10,74 +11,57 @@ interface LoginModalProps {
 interface LoginFormData {
   username: string;
   password: string;
+  [key: string]: string;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<LoginFormData>({
-    username: '',
-    password: '',
-  });
-
-  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const validateForm = (): boolean => {
+  // פונקציית ולידציה ספציפית לטופס ההתחברות
+  const validateLoginForm = (data: LoginFormData) => {
     const newErrors: Partial<LoginFormData> = {};
-
-    if (!formData.username) {
+    if (!data.username) {
       newErrors.username = 'שם משתמש הוא שדה חובה';
     }
-
-    if (!formData.password) {
+    if (!data.password) {
       newErrors.password = 'סיסמה היא שדה חובה';
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
+  // פונקציית שליחת נתונים לשרת ספציפית להתחברות
+  const submitLogin = async (data: LoginFormData) => {
+    const response = await fetch('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify(data)
+    });
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/profile');
-      } else {
-        const error = await response.json();
-        alert(error.message || 'שם משתמש או סיסמה שגויים');
-      }
-    } catch (error) {
-      alert('שגיאה בהתחברות לשרת');
-    } finally {
-      setIsLoading(false);
+    const responseData = await response.json();
+    if (!response.ok) {
+      throw new Error(responseData.message || 'שם משתמש או סיסמה שגויים');
     }
+    return responseData;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name as keyof LoginFormData]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  // שימוש ב-Custom Hook
+  const { formData, errors, isLoading, handleChange, handleSubmit } = useAuthForm<LoginFormData>({
+    initialData: { username: '', password: '' },
+    validator: validateLoginForm,
+    submitHandler: submitLogin,
+    onSuccess: (data) => {
+      console.log(data);
+      navigate("/PersonalProfile");
+      onClose(); // סגירת המודאל לאחר הצלחה
+    },
+    onFailure: (message) => {
+      alert(message);
+    },
+  });
 
   if (!isOpen) return null;
 
@@ -97,7 +81,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Login Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
               <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
