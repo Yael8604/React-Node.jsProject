@@ -2,6 +2,7 @@ const TestSession = require('../models/TestSession');
 const UserAnswer = require('../models/Answer/answer');
 const PsychotechnicalQuestion = require('../models/Question/psychotechnicalQuestion');
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 // הגדרת חלקי הבחינה וזמניהם
 // זוהי הגדרה סטטית לדוגמה. בפועל, ניתן לשלוף את זה ממסד נתונים או קונפיגורציה.
@@ -180,12 +181,35 @@ exports.submitAnswers = async (req, res) => {
 
         await testSession.save();
 
-        res.status(200).json({
-            message: 'Answer submitted successfully',
-            userAnswerId: newUserAnswer._id,
-            isCorrect: isCorrect,
-            score: score,
-        });
+        try {
+            const pythonResponse = await axios.post('http://localhost:5000/analyze_response_time', {
+                userId: userId.toString(),
+                questionId: questionId.toString(),
+                answer: answer,
+                responseTime: timeTaken
+            });
+
+            const analysisResult = pythonResponse.data;
+            console.log('Python analysis result:', analysisResult);
+
+            return res.status(200).json({
+                message: 'Answer submitted successfully and analyzed',
+                userAnswerId: newUserAnswer._id,
+                isCorrect: isCorrect,
+                score: score,
+                analysis: analysisResult
+            });
+
+        } catch (pythonError) {
+            console.error('Error calling Python analytics service:', pythonError.message);
+            return res.status(200).json({
+                message: 'Answer submitted successfully, but analysis failed',
+                userAnswerId: newUserAnswer._id,
+                isCorrect: isCorrect,
+                score: score,
+                analysisError: pythonError.message
+            });
+        }
 
     } catch (error) {
         console.error('Error submitting answer:', error);
