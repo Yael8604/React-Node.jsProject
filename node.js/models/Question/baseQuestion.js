@@ -3,10 +3,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const baseQuestionSchema = new Schema({
-  type: { type: String, required: true, enum: ['psychotechnical', 'personality'] },
-  text: { type: String, required: true },//הטקסט של השאלה
-  testPart: { type: String }//לאיזה חלק של הבחינה השאלה שייכת
-}, { timestamps: true });
+  text: { type: String, required: true },
+  category: { type: String, required: true }, 
+}, { _id: false }); // _id: false כדי לא ליצור מזה תת-מסמך
 
-const BaseQuestion = mongoose.model('BaseQuestion', baseQuestionSchema);
-module.exports = BaseQuestion;
+module.exports = baseQuestionSchema;

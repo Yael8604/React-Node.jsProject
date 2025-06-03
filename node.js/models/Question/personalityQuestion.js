@@ -1,16 +1,33 @@
 // personalityQuestion.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const baseQuestionSchema = require('./baseQuestion').schema; // קבלת הסכמה הבסיסית
+const baseQuestionSchema = require('./baseQuestion');
 
 const personalityQuestionSchema = new Schema({
-  ...baseQuestionSchema.obj, // הוספת השדות מהסכמה הבסיסית
-  scale: { type: String },//הממד האישיותי שהשאלה נועדה למדוד (מוחצנות, נעימות וכו')
-  answerOptions: { type: [String] }, //סולם התגובה (למשל, סולם ליקרט).
-  scoringDirection: { type: String, enum: ['positive', 'negative'] }//האם הסכמה עם ההיגד מעידה על רמה גבוהה או נמוכה בממד הנמדד.
-});
+  ...baseQuestionSchema.obj, 
+  // מגדירים מחדש את category עם enum רלוונטי לאישיותי
+  category: {
+    type: String,
+    enum: [
+      'extraversion',
+      'conscientiousness',
+      'emotional_stability',
+      'openness',
+      'agreeableness',
+      'values',
+      'motivations'
+    ],
+    required: true
+  },
+  scale: {
+    type: String,
+    enum: ['likert', 'binary', 'frequency'],
+    default: 'likert'
+  },
+  reverseScored: { type: Boolean, default: false }
+}, { timestamps: true });
 
-const PersonalityQuestion = mongoose.model('PersonalityQuestion', personalityQuestionSchema,'personality_questions');
+const PersonalityQuestion = mongoose.model('PersonalityQuestion', personalityQuestionSchema);
 module.exports = PersonalityQuestion;
 
 

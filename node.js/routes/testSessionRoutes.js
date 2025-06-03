@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const verifyJWT = require('../middleware/verifyJWT');
+const testController = require('../controllers/testSessionController');
 
-const testController = require('../controllers/testSessionController') 
+// נתיב חדש: התחלת בחינה פסיכוטכנית - יחזיר את מבנה הבחינה והשאלות
+router.get('/start-psychotechnical', verifyJWT, testController.startPsychotechnicalExam);
 
-// router.post("/start", verifyJWT,testSessionController.startTestSession)
+// שינוי: נתיב שליחת תשובה בודדת (עם timeTaken)
+router.post('/submit-answer', verifyJWT, testController.submitAnswers);
 
-module.exports = router
+// נתיב חדש: סיום סשן בחינה
+router.post('/end-session', verifyJWT, testController.endTestSession);
+
+// נתיב חדש: מעבר לחלק הבא
+router.post('/next-section', verifyJWT, testController.moveToNextSection);
+
+module.exports = router;
 
 // // src/routes/testSessionRoutes.js
 // const express = require('express');

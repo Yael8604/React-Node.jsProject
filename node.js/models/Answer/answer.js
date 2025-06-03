@@ -9,9 +9,9 @@ const answerSchema = new Schema({
   answer: { type: Schema.Types.Mixed, required: true }, // ערך התשובה שנבחרה (יכול להיות טקסט או מספר)
   isCorrect: { type: Boolean }, // רלוונטי רק לשאלות פסיכוטכניות
   score: { type: Number }, // ציון נפרד לכל שאלה (למשל 1/0, או ניקוד ליקרט)
-  answeredAt: { type: Date, default: Date.now } // זמן מענה
+  answeredAt: { type: Date, default: Date.now }, // זמן מענה
+  timeTaken: { type: Number } // זמן שלקח למשתמש לענות על השאלה (באלפיות השנייה, או שניות - נחליט בהמשך) **
 }, { timestamps: true });
 
 const UserAnswer = mongoose.model('userAnswer', answerSchema);
 module.exports = UserAnswer;
-

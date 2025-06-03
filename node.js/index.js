@@ -39,5 +39,4 @@ app.get('/',function(req,res){
 app.use("/api/auth", require("./routes/authRoutes"))
 app.use('/api/users', userRoutes);
 app.use('/api', questionRoutes);
-app.use('/api/testSessions', testSessionRoutes);
-
+app.use('/api/testSession', testSessionRoutes);
