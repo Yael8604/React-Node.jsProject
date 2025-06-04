@@ -1,5 +1,6 @@
 # ========== Node.js ==========
 /node_modules
+node.js/node_modules/
 /.pnp
 .pnp.js
 
@@ -40,4 +41,4 @@ yarn-error.log*
 
 # ========== IDEs ==========
 .idea/
-.vscode/
+.vscode/n
