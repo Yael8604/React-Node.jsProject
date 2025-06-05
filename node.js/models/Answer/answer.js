@@ -10,7 +10,11 @@ const answerSchema = new Schema({
   isCorrect: { type: Boolean }, // רלוונטי רק לשאלות פסיכוטכניות
   score: { type: Number }, // ציון נפרד לכל שאלה (למשל 1/0, או ניקוד ליקרט)
   answeredAt: { type: Date, default: Date.now }, // זמן מענה
-  timeTaken: { type: Number } // זמן שלקח למשתמש לענות על השאלה (באלפיות השנייה, או שניות - נחליט בהמשך) **
+  timeTaken: { type: Number }, // זמן שלקח למשתמש לענות על השאלה (באלפיות השנייה, או שניות - נחליט בהמשך) **
+  analysisResults: { // חדש: תוצאות ניתוח מפייתון
+        type: Schema.Types.Mixed, // יכול להכיל מבנה JSON גמיש
+        default: {}
+    }
 }, { timestamps: true });
 
 const UserAnswer = mongoose.model('userAnswer', answerSchema);

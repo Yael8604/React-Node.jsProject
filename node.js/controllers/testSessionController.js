@@ -125,8 +125,6 @@ exports.startPsychotechnicalExam = async (req, res) => {
     });
 };
 
-// ---
-
 exports.submitAnswers = async (req, res) => {
     if (!req.user || !req.user._id) {
         console.error('[submitAnswers] Unauthorized attempt: User not logged in or req.user is missing.');
@@ -171,28 +169,54 @@ exports.submitAnswers = async (req, res) => {
         });
 
         let newUserAnswer;
+
+
+
         if (existingUserAnswer) {
             console.log(`[submitAnswers] Updating existing answer for question ${questionId}.`);
             existingUserAnswer.answer = answer;
             existingUserAnswer.timeTaken = timeTaken;
             existingUserAnswer.isCorrect = isCorrect;
             existingUserAnswer.score = score;
-            await existingUserAnswer.save();
             newUserAnswer = existingUserAnswer;
         } else {
             console.log(`[submitAnswers] Creating new answer for question ${questionId}.`);
             newUserAnswer = new UserAnswer({
-                user: userId,
-                questionId: questionId,
-                questionType: testSession.testType,
-                answer: answer,
-                isCorrect: isCorrect,
-                score: score,
-                timeTaken: timeTaken
-            });
-            await newUserAnswer.save();
-            testSession.answers.push(newUserAnswer._id);
-        }
+            user: userId,
+            questionId: questionId,
+            questionType: testSession.testType,
+            answer: answer,
+            isCorrect: isCorrect,
+            score: score,
+            timeTaken: timeTaken
+    });
+    testSession.answers.push(newUserAnswer._id);
+}
+
+        // if (existingUserAnswer) {
+        //     console.log(`[submitAnswers] Updating existing answer for question ${questionId}.`);
+        //     existingUserAnswer.answer = answer;
+        //     existingUserAnswer.timeTaken = timeTaken;
+        //     existingUserAnswer.isCorrect = isCorrect;
+        //     existingUserAnswer.score = score;
+        //     existingUserAnswer.analysisResults = analysisResult; // עדכן את תוצאות הניתוח
+        //     await existingUserAnswer.save();
+        //     newUserAnswer = existingUserAnswer;
+        // } else {
+        //     console.log(`[submitAnswers] Creating new answer for question ${questionId}.`);
+        //     newUserAnswer = new UserAnswer({
+        //         user: userId,
+        //         questionId: questionId,
+        //         questionType: testSession.testType,
+        //         answer: answer,
+        //         isCorrect: isCorrect,
+        //         score: score,
+        //         timeTaken: timeTaken,
+        //         analysisResults: analysisResult
+        //     });
+        //     await newUserAnswer.save();
+        //     testSession.answers.push(newUserAnswer._id);
+        // }
 
         const currentSectionScore = testSession.rawScores.get(currentSection.sectionName) || 0;
         testSession.rawScores.set(currentSection.sectionName, currentSectionScore + score);
@@ -201,36 +225,85 @@ exports.submitAnswers = async (req, res) => {
         await testSession.save();
         console.log(`[submitAnswers] Test session ${sessionId} updated with answer ${newUserAnswer._id}.`);
 
+        // try {
+        //     console.log(`[submitAnswers] Calling Python analytics service for question ${questionId}.`);
+        //     const pythonResponse = await axios.post('http://localhost:5000/analyze_response_time', {
+        //         userId: userId.toString(),
+        //         questionId: questionId.toString(),
+        //         answer: answer,
+        //         responseTime: timeTaken
+        //     });
+
+        //     const analysisResult = pythonResponse.data;
+        //     console.log('[submitAnswers] Python analysis result:', analysisResult);
+
+        //     return res.status(200).json({
+        //         message: 'Answer submitted successfully and analyzed',
+        //         userAnswerId: newUserAnswer._id,
+        //         isCorrect: isCorrect,
+        //         score: score,
+        //         analysis: analysisResult,
+        //         analysis: analysisResult // החזר את תוצאות הניתוח גם לפרונטאנד
+        //     });
+
+        // } catch (pythonError) {
+        //     console.error('[submitAnswers] Error calling Python analytics service:', pythonError.message);
+        //     return res.status(200).json({
+        //         message: 'Answer submitted successfully, but analysis failed',
+        //         userAnswerId: newUserAnswer._id,
+        //         isCorrect: isCorrect,
+        //         score: score,
+        //         analysisError: pythonError.message
+        //     });
+        // }
         try {
-            console.log(`[submitAnswers] Calling Python analytics service for question ${questionId}.`);
-            const pythonResponse = await axios.post('http://localhost:5000/analyze_response_time', {
-                userId: userId.toString(),
-                questionId: questionId.toString(),
-                answer: answer,
-                responseTime: timeTaken
-            });
+    console.log(`[submitAnswers] Calling Python analytics service for question ${questionId}.`);
+    const pythonResponse = await axios.post('http://localhost:5000/analyze_response_time', {
+        userId: userId.toString(),
+        questionId: questionId.toString(),
+        answer: answer,
+        responseTime: timeTaken
+    });
 
-            const analysisResult = pythonResponse.data;
-            console.log('[submitAnswers] Python analysis result:', analysisResult);
+    const analysisResult = pythonResponse.data;
+    console.log('[submitAnswers] Python analysis result:', analysisResult);
 
-            return res.status(200).json({
-                message: 'Answer submitted successfully and analyzed',
-                userAnswerId: newUserAnswer._id,
-                isCorrect: isCorrect,
-                score: score,
-                analysis: analysisResult
-            });
+    // עדכון של השדה לאחר קבלת הנתון מה-Python
+    newUserAnswer.analysisResults = analysisResult;
+    await newUserAnswer.save();
 
-        } catch (pythonError) {
-            console.error('[submitAnswers] Error calling Python analytics service:', pythonError.message);
-            return res.status(200).json({
-                message: 'Answer submitted successfully, but analysis failed',
-                userAnswerId: newUserAnswer._id,
-                isCorrect: isCorrect,
-                score: score,
-                analysisError: pythonError.message
-            });
-        }
+    await testSession.save();
+    console.log(`[submitAnswers] Test session ${sessionId} updated with answer ${newUserAnswer._id}.`);
+
+    return res.status(200).json({
+        message: 'Answer submitted successfully and analyzed',
+        userAnswerId: newUserAnswer._id,
+        isCorrect: isCorrect,
+        score: score,
+        analysis: analysisResult
+    });
+
+} catch (pythonError) {
+    console.error('[submitAnswers] Error calling Python analytics service:', pythonError.message);
+
+    // שמירת התשובה גם אם אין ניתוח
+    await newUserAnswer.save();
+    await testSession.save();
+
+    return res.status(200).json({
+        message: 'Answer submitted successfully, but analysis failed',
+        userAnswerId: newUserAnswer._id,
+        isCorrect: isCorrect,
+        score: score,
+        analysisError: pythonError.message
+    });
+}
+
+
+
+
+
+
       
 
         return res.status(200).json({
@@ -246,8 +319,6 @@ exports.submitAnswers = async (req, res) => {
         res.status(500).json({ message: 'Failed to submit answer', error: error.message });
     }
 };
-
-// ---
 
 exports.endTestSession = async (req, res) => {
     if (!req.user || !req.user._id) {
