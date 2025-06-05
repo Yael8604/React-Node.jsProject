@@ -1,0 +1,58 @@
+{
+  "psychometricResults": {
+    "overallScore": 85,
+    "technicalAbility": {
+      "score": 90,
+      "average": 70,
+      "description": "יכולת טכנית גבוהה המצביעה על הבנה מעולה של עקרונות מכניים וטכנולוגיים."
+    },
+    "logicalReasoning": {
+      "score": 80,
+      "average": 68,
+      "description": "יכולת הסקה לוגית טובה, המאפשרת לך לפתור בעיות מורכבות ביעילות."
+    },
+    "spatialReasoning": {
+      "score": 75,
+      "average": 65,
+      "description": "חשיבה מרחבית ממוצעת, עם פוטנציאל לשיפור באמצעות תרגול."
+    },
+    "quantitativeReasoning": {
+      "score": 92,
+      "average": 72,
+      "description": "יכולת מספרית וכימותית יוצאת דופן, המעידה על כישרון בניתוח נתונים."
+    },
+    "verbalReasoning": {
+      "score": 88,
+      "average": 74,
+      "description": "הבנת הנקרא ויכולת מילולית גבוהה, המאפשרת ניסוח רעיונות בבהירות."
+    }
+  },
+  "personalityResults": {
+    "openness": {
+      "score": 70,
+      "description": "רמת פתיחות גבוהה לחוויות ורעיונות חדשים."
+    },
+    "conscientiousness": {
+      "score": 85,
+      "description": "מצפוניות וארגון ברמה גבוהה, המעידה על יכולת התמדה ומסירות."
+    },
+    "extraversion": {
+      "score": 60,
+      "description": "נטייה ממוצעת כלפי מוחצנות, נוח לך במצבים חברתיים אך גם לבד."
+    },
+    "agreeableness": {
+      "score": 90,
+      "description": "נועם הליכות ויכולת שיתוף פעולה מצוינת."
+    },
+    "neuroticism": {
+      "score": 40,
+      "description": "רמת נוירוטיות נמוכה, המעידה על יציבות רגשית ורוגע."
+    },
+    "overallPersonalitySummary": "הפרופיל האישיותי שלך מאופיין בשילוב של ארגון, נועם הליכות ופתיחות, מה שמצביע על יכולת הסתגלות גבוהה ויחסי אנוש טובים."
+  },
+  "recommendations": [
+    "תחומים מומלצים: הנדסה, מדעי הנתונים, פיתוח תוכנה.",
+    "המלצות לשיפור: תרגול חשיבה מרחבית באמצעות משחקי חשיבה וחידות."
+  ]
+}
+
