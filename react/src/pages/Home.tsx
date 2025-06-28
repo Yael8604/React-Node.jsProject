@@ -8,60 +8,113 @@ const Home = () => {
   const [showLogin, setShowLogin] = useState(false);
 
   const Logo = () => (
-    <svg viewBox="0 0 320 90" className="h-24 w-auto">
-      <defs>
-        <linearGradient id="geometricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{stopColor:'#8b5cf6', stopOpacity:1}} />
-          <stop offset="50%" style={{stopColor:'#7c3aed', stopOpacity:1}} />
-          <stop offset="100%" style={{stopColor:'#6d28d9', stopOpacity:1}} />
-        </linearGradient>
-        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{stopColor:'#10b981', stopOpacity:1}} />
-          <stop offset="100%" style={{stopColor:'#059669', stopOpacity:1}} />
-        </linearGradient>
-        <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style={{stopColor:'#1f2937', stopOpacity:1}} />
-          <stop offset="100%" style={{stopColor:'#374151', stopOpacity:1}} />
-        </linearGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
+    // <svg viewBox="0 0 320 90" className="h-24 w-auto">
+    //   <defs>
+    //     <linearGradient id="geometricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    //       <stop offset="0%" style={{stopColor:'#8b5cf6', stopOpacity:1}} />
+    //       <stop offset="50%" style={{stopColor:'#7c3aed', stopOpacity:1}} />
+    //       <stop offset="100%" style={{stopColor:'#6d28d9', stopOpacity:1}} />
+    //     </linearGradient>
+    //     <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    //       <stop offset="0%" style={{stopColor:'#10b981', stopOpacity:1}} />
+    //       <stop offset="100%" style={{stopColor:'#059669', stopOpacity:1}} />
+    //     </linearGradient>
+    //     <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    //       <stop offset="0%" style={{stopColor:'#1f2937', stopOpacity:1}} />
+    //       <stop offset="100%" style={{stopColor:'#374151', stopOpacity:1}} />
+    //     </linearGradient>
+    //     <filter id="glow">
+    //       <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+    //       <feMerge>
+    //         <feMergeNode in="coloredBlur"/>
+    //         <feMergeNode in="SourceGraphic"/>
+    //       </feMerge>
+    //     </filter>
+    //   </defs>
       
-      <g transform="translate(15, 15)">
-        <g filter="url(#glow)">
-          <circle cx="30" cy="30" r="25" fill="none" stroke="url(#geometricGradient)" strokeWidth="3"/>
-          <g transform="translate(30, 30)">
-            <circle cx="0" cy="-8" r="7" fill="url(#geometricGradient)"/>
-            <path d="M -10 2 Q -10 -1 -7 -1 L 7 -1 Q 10 -1 10 2 L 10 12 L -10 12 Z" 
-                  fill="url(#geometricGradient)"/>
-          </g>
-          <circle cx="22" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
-          <circle cx="38" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
-          <circle cx="30" cy="38" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
-        </g>
-      </g>
+    //   <g transform="translate(15, 15)">
+    //     <g filter="url(#glow)">
+    //       <circle cx="30" cy="30" r="25" fill="none" stroke="url(#geometricGradient)" strokeWidth="3"/>
+    //       <g transform="translate(30, 30)">
+    //         <circle cx="0" cy="-8" r="7" fill="url(#geometricGradient)"/>
+    //         <path d="M -10 2 Q -10 -1 -7 -1 L 7 -1 Q 10 -1 10 2 L 10 12 L -10 12 Z" 
+    //               fill="url(#geometricGradient)"/>
+    //       </g>
+    //       <circle cx="22" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
+    //       <circle cx="38" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
+    //       <circle cx="30" cy="38" r="3.5" fill="url(#accentGradient)" opacity="0.9"/>
+    //     </g>
+    //   </g>
       
-      <g transform="translate(80, 38)">
-        <text fontFamily="Poppins, Arial, sans-serif" fontSize="36" fontWeight="700" letterSpacing="-0.5">
-          <tspan x="0" y="0" fill="url(#textGradient)">Pro</tspan>
-          <tspan x="48" y="0" fill="url(#geometricGradient)">Profile</tspan>
-        </text>
+    //   <g transform="translate(80, 38)">
+    //     <text fontFamily="Poppins, Arial, sans-serif" fontSize="36" fontWeight="700" letterSpacing="-0.5">
+    //       <tspan x="0" y="0" fill="url(#textGradient)">Pro</tspan>
+    //       <tspan x="48" y="0" fill="url(#geometricGradient)">Profile</tspan>
+    //     </text>
         
-        <g transform="translate(0, 20)">
-          <rect x="0" y="-1" width="30" height="2" rx="1" fill="url(#accentGradient)" opacity="0.7"/>
-          <text x="35" y="1" fontFamily="Inter, Arial, sans-serif" fontSize="11" fontWeight="500" fill="#6b7280">
-            Personality. Ability. Adaptability
-          </text>
-        </g>
-      </g>
+    //     <g transform="translate(0, 20)">
+    //       <rect x="0" y="-1" width="30" height="2" rx="1" fill="url(#accentGradient)" opacity="0.7"/>
+    //       <text x="35" y="1" fontFamily="Inter, Arial, sans-serif" fontSize="11" fontWeight="500" fill="#6b7280">
+    //         Personality. Ability. Adaptability
+    //       </text>
+    //     </g>
+    //   </g>
       
-      <rect x="280" y="30" width="2.5" height="30" rx="1.25" fill="url(#accentGradient)" opacity="0.4"/>
-    </svg>
+    //   <rect x="280" y="30" width="2.5" height="30" rx="1.25" fill="url(#accentGradient)" opacity="0.4"/>
+    // </svg>
+    <svg viewBox="0 0 320 90" className="h-24 w-auto" fill="none">
+    <defs>
+      <linearGradient id="geometricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="1" />
+        <stop offset="50%" stopColor="#7c3aed" stopOpacity="1" />
+        <stop offset="100%" stopColor="#6d28d9" stopOpacity="1" />
+      </linearGradient>
+      <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
+        <stop offset="100%" stopColor="#059669" stopOpacity="1" />
+      </linearGradient>
+      <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#1f2937" stopOpacity="1" />
+        <stop offset="100%" stopColor="#374151" stopOpacity="1" />
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+        <feMerge>
+          <feMergeNode in="coloredBlur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <g transform="translate(15, 15)">
+      <g filter="url(#glow)">
+        <circle cx="30" cy="30" r="25" fill="none" stroke="url(#geometricGradient)" strokeWidth="3" />
+        <g transform="translate(30, 30)">
+          <circle cx="0" cy="-8" r="7" fill="url(#geometricGradient)" />
+          <path d="M -10 2 Q -10 -1 -7 -1 L 7 -1 Q 10 -1 10 2 L 10 12 L -10 12 Z" fill="url(#geometricGradient)" />
+        </g>
+        <circle cx="22" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9" />
+        <circle cx="38" cy="22" r="3.5" fill="url(#accentGradient)" opacity="0.9" />
+        <circle cx="30" cy="38" r="3.5" fill="url(#accentGradient)" opacity="0.9" />
+      </g>
+    </g>
+
+    <g transform="translate(80, 38)">
+      <text fontFamily="Poppins, Arial, sans-serif" fontSize="36" fontWeight="700" letterSpacing="-0.5">
+        <tspan x="0" y="0" fill="url(#textGradient)">Pro</tspan>
+        <tspan x="48" y="0" fill="url(#geometricGradient)">Profile</tspan>
+      </text>
+      <g transform="translate(0, 20)">
+        <rect x="0" y="-1" width="30" height="2" rx="1" fill="url(#accentGradient)" opacity="0.7" />
+        <text x="35" y="1" fontFamily="Inter, Arial, sans-serif" fontSize="11" fontWeight="500" fill="#6b7280">
+          Personality. Ability. Adaptability
+        </text>
+      </g>
+    </g>
+
+    <rect x="280" y="30" width="2.5" height="30" rx="1.25" fill="url(#accentGradient)" opacity="0.4" />
+  </svg>
+
   );
 
   return (

@@ -1,6 +1,6 @@
-// testSessionController.js (או הקובץ המקביל שלך לקונטרולר)
+// testSessionController.js
 
-const TestSession = require('../models/TestSession'); // השאר את השורה הזו!
+const TestSession = require('../models/TestSession');
 const UserAnswer = require('../models/Answer/answer');
 const PsychotechnicalQuestion = require('../models/Question/psychotechnicalQuestion');
 const mongoose = require('mongoose');
@@ -33,7 +33,7 @@ const calculatePsychotechnicalScore = async (questionId, userAnswerText) => {
     }
 };
 
-// חדש: פונקציה להתחלת סשן בחינה
+// פונקציה להתחלת סשן בחינה
 exports.startPsychotechnicalExam = async (req, res) => {
     if (!req.user || !req.user._id) {
         console.error('[startExam] Unauthorized attempt: User not logged in or req.user is missing.');
