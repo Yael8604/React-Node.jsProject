@@ -1,14 +1,45 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import html2pdf from "html2pdf.js";
+
 import PsychometricResults from "../components/PsychometricResults";
 import PersonalityResults from "../components/PersonalityResults";
 import Recommendations from "../components/Recommendations";
-import mockResultsData from "../data/mockResults.json";
-import { ResultsData } from "../types/resultsTypes";
 
-const Results: React.FC = () => {
-  const results: ResultsData = mockResultsData;
+import { ResultsData } from "../types/resultsTypes";
+import { Spinner } from "../components/ui/Spinner";
+import { ErrorCard } from "../components/ui/ErrorCard";
+
+
+const fetchResults = async (): Promise<ResultsData> => {
+  const res = await fetch("http://localhost:3000/api/results", {
+    credentials: "include", // חשוב לשליחת cookies
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    const errData = await res.json();
+    throw new Error(errData?.error || "שגיאה בטעינת התוצאות");
+  }
+
+  return res.json();
+};
+
+interface ResultsProps {
+  results?: ResultsData;
+}
+
+const Results: React.FC<ResultsProps> = () => {
+
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["results"],
+    queryFn: fetchResults,
+    refetchOnWindowFocus: false,
+  });
+  if (isLoading) return <Spinner message="טוען את תוצאות הבחינה..." />;
+  if (isError || !data) return <ErrorCard error={error || new Error("לא נמצאו נתונים להצגה")} />;
+
 
   const handleDownloadPDF = () => {
     const element = document.getElementById("results-to-export");
@@ -55,17 +86,17 @@ const Results: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <PsychometricResults data={results} />
+          <PsychometricResults data={data!} />
         </motion.div>
 
-        <motion.div
+        {/* <motion.div
           className="results-section"
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <PersonalityResults data={results.personalityResults} />
-        </motion.div>
+          <PersonalityResults data={data!.personalityResults} />
+        </motion.div> */}
 
         <motion.div
           className="results-section"
@@ -73,7 +104,7 @@ const Results: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <Recommendations data={results.recommendations} />
+          <Recommendations data={data!.recommendations} />
         </motion.div>
       </div>
     </motion.div>

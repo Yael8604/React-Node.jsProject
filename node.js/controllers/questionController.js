@@ -1,4 +1,3 @@
-// controllers/questionController.js
 const PsychotechnicalQuestion = require('../models/Question/psychotechnicalQuestion');
 
 exports.getQuestions = async (req, res) => {
