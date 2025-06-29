@@ -1,89 +1,25 @@
-// src/components/RegisterModal.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthForm from '../hooks/useAuthForm'; // ייבוא ה-hook
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registerSchema, RegisterFormData } from '../schemas/registerSchema'; // ייבוא הסכמה
 
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface RegisterFormData {
-  username: string;
-  password: string;
-  confirmPassword: string;
-  name: string;
-  email: string;
-  phone: string;
-  birthDate: string;
-  [key: string]: string;
-}
-
 const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
-  // פונקציית ולידציה ספציפית לטופס ההרשמה
-  const validateRegisterForm = (data: RegisterFormData) => {
-    const newErrors: Partial<RegisterFormData> = {};
-
-    if (!data.username) {
-      newErrors.username = 'שם משתמש הוא שדה חובה';
-    } else if (data.username.length < 3) {
-      newErrors.username = 'שם משתמש חייב להכיל לפחות 3 תווים';
-    }
-
-    if (!data.password) {
-      newErrors.password = 'סיסמה היא שדה חובה';
-    } else if (data.password.length < 6) {
-      newErrors.password = 'סיסמה חייבת להכיל לפחות 6 תווים';
-    }
-
-    if (data.password !== data.confirmPassword) {
-      newErrors.confirmPassword = 'הסיסמאות לא תואמות';
-    }
-
-    if (!data.name) {
-      newErrors.name = 'שם מלא הוא שדה חובה';
-    }
-
-    if (data.email && !/\S+@\S+\.\S+/.test(data.email)) {
-      newErrors.email = 'כתובת אימייל לא תקינה';
-    }
-
-    if (!data.birthDate) {
-      newErrors.birthDate = 'תאריך לידה הוא שדה חובה';
-    }
-
-    return newErrors;
-  };
-
-  // פונקציית שליחת נתונים לשרת ספציפית להרשמה
-  const submitRegister = async (data: RegisterFormData) => {
-    const response = await fetch('http://localhost:3000/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: data.username,
-        password: data.password,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        birthDate: data.birthDate,
-      }),
-    });
-
-    const responseData = await response.json();
-    if (!response.ok) {
-      throw new Error(responseData.message || 'שגיאה בהרשמה');
-    }
-    return responseData;
-  };
-
-  // שימוש ב-Custom Hook
-  const { formData, errors, isLoading, handleChange, handleSubmit } = useAuthForm<RegisterFormData>({
-    initialData: {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError, // נוסף כדי להגדיר שגיאות מהשרת
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
       username: '',
       password: '',
       confirmPassword: '',
@@ -92,18 +28,55 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
       phone: '',
       birthDate: '',
     },
-    validator: validateRegisterForm,
-    submitHandler: submitRegister,
-    onSuccess: (data) => {
-      console.log(data);
+  });
 
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          // שימו לב: אם השרת מצפה לפורמט תאריך ספציפי, ייתכן שיהיה צורך בפורמט לפני השליחה.
+          birthDate: data.birthDate,
+        }),
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        // טיפול בשגיאות מהשרת ועדכון השגיאות בטופס
+        if (responseData.message) {
+            // אם יש הודעה ספציפית מהשרת, נציג אותה
+            alert(responseData.message);
+        } else {
+            // אחרת, שגיאה כללית
+            alert('שגיאה בהרשמה');
+        }
+        throw new Error(responseData.message || 'שגיאה בהרשמה');
+      }
+      
+      console.log(responseData);
       navigate("/PersonalProfile");
       onClose(); // סגירת המודאל לאחר הצלחה
-    },
-    onFailure: (message) => {
-      alert(message);
-    },
-  });
+    } catch (error: any) {
+      // אם יש צורך להציג שגיאות שדה ספציפיות מהשרת
+      // לדוגמה, אם השרת מחזיר { field: "username", message: "שם משתמש תפוס" }
+      if (error.response && error.response.data && error.response.data.field) {
+        setError(error.response.data.field, {
+          type: "server",
+          message: error.response.data.message,
+        });
+      } else {
+        alert(error.message || 'אירעה שגיאה בלתי צפויה.');
+      }
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -123,79 +96,67 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">שם משתמש *</label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
+                {...register("username")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="הכנס שם משתמש"
               />
-              {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+              {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">שם מלא *</label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
+                {...register("name")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="הכנס שם מלא"
               />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">סיסמה *</label>
               <input
                 type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
+                {...register("password")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="הכנס סיסמה"
               />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">אימות סיסמה *</label>
               <input
                 type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
+                {...register("confirmPassword")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="הכנס סיסמה שוב"
               />
-              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">כתובת אימייל</label>
               <input
                 type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
+                {...register("email")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="הכנס אימייל"
               />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">מספר טלפון</label>
               <input
                 type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
+                {...register("phone")} // שימוש ב-register
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="הכנס מספר טלפון"
               />
@@ -205,21 +166,19 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">תאריך לידה *</label>
               <input
                 type="date"
-                name="birthDate"
-                value={formData.birthDate}
-                onChange={handleChange}
+                {...register("birthDate")} // שימוש ב-register
                 className={`w-full px-4 py-2 border ${errors.birthDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
               />
-              {errors.birthDate && <p className="text-red-500 text-xs mt-1">{errors.birthDate}</p>}
+              {errors.birthDate && <p className="text-red-500 text-xs mt-1">{errors.birthDate.message}</p>}
             </div>
 
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isSubmitting} // isSubmitting מ-React Hook Form
                 className="flex-1 bg-primary-500 text-white py-3 rounded-lg hover:bg-primary-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'נרשם...' : 'הרשמה'}
+                {isSubmitting ? 'נרשם...' : 'הרשמה'}
               </button>
               <button
                 type="button"

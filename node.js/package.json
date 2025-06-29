@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -19,6 +20,8 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "6.16",
-    "mongoose": "^8.13.3"
+    "mongoose": "^8.13.3",
+    "react-hook-form": "^7.59.0",
+    "zod": "^3.25.67"
   }
 }
