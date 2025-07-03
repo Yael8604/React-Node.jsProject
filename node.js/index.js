@@ -8,9 +8,9 @@ const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const testSessionRoutes = require('./routes/testSessionRoutes');
+const resultsRoutes = require('./routes/resultsRoutes')
 
 dotenv.config();
-// connectDB();//לא בטוח צריך את השורה הזו
 
 const app = express();
 const port = 3000;
@@ -40,3 +40,4 @@ app.use("/api/auth", require("./routes/authRoutes"))
 app.use('/api/users', userRoutes);
 app.use('/api', questionRoutes);
 app.use('/api/testSession', testSessionRoutes);
+app.use('/api',resultsRoutes);

@@ -1,10 +1,9 @@
-// testSessionController.js
+const TestSession = require('../models/TestSession'); 
 
-const TestSession = require('../models/TestSession');
 const UserAnswer = require('../models/Answer/answer');
 const PsychotechnicalQuestion = require('../models/Question/psychotechnicalQuestion');
 const mongoose = require('mongoose');
-const axios = require('axios'); // נשאר כי הוא מיובא, גם אם לא בשימוש ישיר בחלק המוסלש
+const axios = require('axios');
 
 // הגדרת חלקי הבחינה וזמניהם
 const EXAM_STRUCTURE = {
